@@ -222,6 +222,48 @@ class UserTest {
         }
     }
 
+    @Nested
+    @DisplayName("Tests For User Purchased List")
+    public class PurchasedListTests {
 
+
+        User createUserWitEmptyPurchasedList(){
+            return createUserWithGivenPurchasedList(Map.of());
+        }
+
+        User createUserWithGivenPurchasedList(Map<String,Integer> purchases){
+            var user = new User();
+            user.setPurchasedList(new HashMap<>(purchases));
+            return user;
+        }
+
+        void UserPurchasedListShouldBe(User user, Map<String, Integer> expectedPurchasedList){
+            var userPurchasedList = user.getPurchasedList();
+            Assertions.assertEquals(userPurchasedList, expectedPurchasedList);
+        }
+
+        //TODO: should add tests for negative quantity?
+
+        @Test
+        public void GIVEN_UserWithEmptyPurchasedList_WHEN_AddingANewItem_THEN_ItemShouldBeAdded(){
+
+            var user = createUserWitEmptyPurchasedList();
+
+            user.addPurchasedItem("Purchased Item", 1);
+
+            UserPurchasedListShouldBe(user, Map.of("Purchased Item", 1));
+        }
+
+        @Test
+        public void GIVEN_UserWithNonEmptyPurchasedList_WHEN_AddingADuplicateItem_THEN_ItemQuantityShouldBeIncreased(){
+
+            var user = createUserWithGivenPurchasedList(Map.of("Purchased Item", 1));
+
+            user.addPurchasedItem("Purchased Item", 1);
+
+            UserPurchasedListShouldBe(user, Map.of("Purchased Item", 2));
+        }
+
+    }
 
 }
