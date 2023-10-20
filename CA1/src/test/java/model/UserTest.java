@@ -61,7 +61,7 @@ class UserTest {
 
 
         @Test
-        public void GIVEN_UserWithZeroCredit_WHEN_WithdrawingMoreThanUserCredit_THEN_willThrowInsufficientCredit
+        public void GIVEN_UserWithZeroCredit_WHEN_WithdrawingMoreThanUserCredit_THEN_WillThrowInsufficientCredit
                 (){
 
             var user = createAnonymousUserWithCredit(0);
@@ -76,7 +76,7 @@ class UserTest {
         //TODO: ask TA: why code doesn't handle this case? is it a bug in code?
         // am i allowed to write such tests?
         @Test
-        public void GIVEN_UserWithZeroCredit_WHEN_WithdrawingByNegativeValue_THEN_willThrowSomeException
+        public void GIVEN_UserWithZeroCredit_WHEN_WithdrawingByNegativeValue_THEN_WillThrowSomeException
         (){
 
             var user = createAnonymousUserWithCredit(0);
@@ -89,7 +89,7 @@ class UserTest {
         }
 
         @Test
-        public void GIVEN_UserWithSomeCredit_WHEN_WithdrawingLessThanUserCredit_THEN_willDecreaseUserCredit
+        public void GIVEN_UserWithSomeCredit_WHEN_WithdrawingLessThanUserCredit_THEN_WillDecreaseUserCredit
                 () throws InsufficientCredit {
 
             var user = createAnonymousUserWithCredit(10f);
