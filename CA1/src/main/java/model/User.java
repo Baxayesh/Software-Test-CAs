@@ -40,14 +40,18 @@ public class User {
         this.credit += amount;
     }
 
-    public void withdrawCredit(float amount) throws InsufficientCredit {
+    public void withdrawCredit(float amount) throws InsufficientCredit, InvalidCreditRange {
         if (amount > this.credit)
             throw new InsufficientCredit();
+
+        if(amount < 0)
+            throw new InvalidCreditRange();
 
         this.credit -= amount;
     }
 
     public void addBuyItem(Commodity commodity) {
+
         String id = commodity.getId();
         if (this.buyList.containsKey(id)) {
             int existingQuantity = this.buyList.get(id);
@@ -57,6 +61,16 @@ public class User {
     }
 
     public void addPurchasedItem(String id, int quantity) {
+
+        if(id == null || id.isEmpty())
+            throw new NullPointerException("Purchased Item Id Cannot Be Null/Empty");
+
+        if(quantity == 0)
+            return;
+
+        if(quantity < 0)
+            throw new RuntimeException("Purchased Item Quantity Cannot Be Negative");
+
         if (this.purchasedList.containsKey(id)) {
             int existingQuantity = this.purchasedList.get(id);
             this.purchasedList.put(id, existingQuantity + quantity);

@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,7 +26,7 @@ class UserTest {
 
 
         @Test
-        public void GIVEN_UserWithZeroCredit_WHEN_AddingNegativeCredit_THEN_WillThrowInvalidCreditRange() {
+        public void GIVEN_AnonymousUser_WHEN_AddingNegativeCredit_THEN_WillThrowInvalidCreditRange() {
 
             var user = createAnonymousUserWithCredit(0);
             var negativeIncrement = -1f;
@@ -36,7 +38,7 @@ class UserTest {
         }
 
         @Test
-        public void GIVEN_UserWithZeroCredit_WHEN_AddingZeroCredit_THEN_UserCreditWillNotChange()
+        public void GIVEN_AnonymousUser_WHEN_AddingZeroCredit_THEN_UserCreditWillNotChange()
                 throws InvalidCreditRange {
 
             var user = createAnonymousUserWithCredit(0);
@@ -48,7 +50,7 @@ class UserTest {
         }
 
         @Test
-        public void GIVEN_UserWithZeroCredit_WHEN_AddingPositiveCredit_THEN_UserCreditWillBeIncreased()
+        public void GIVEN_AnonymousUser_WHEN_AddingPositiveCredit_THEN_UserCreditWillBeIncreased()
                 throws InvalidCreditRange {
 
             var user = createAnonymousUserWithCredit(0);
@@ -73,10 +75,9 @@ class UserTest {
             );
         }
 
-        //TODO: ask TA: why code doesn't handle this case? is it a bug in code?
-        // am i allowed to write such tests?
+
         @Test
-        public void GIVEN_UserWithZeroCredit_WHEN_WithdrawingByNegativeValue_THEN_WillThrowSomeException
+        public void GIVEN_UserWithZeroCredit_WHEN_WithdrawingByNegativeValue_THEN_WillThrowInvalidCreditRange
         (){
 
             var user = createAnonymousUserWithCredit(0);
@@ -90,7 +91,7 @@ class UserTest {
 
         @Test
         public void GIVEN_UserWithSomeCredit_WHEN_WithdrawingLessThanUserCredit_THEN_WillDecreaseUserCredit
-                () throws InsufficientCredit {
+                () throws InsufficientCredit, InvalidCreditRange {
 
             var user = createAnonymousUserWithCredit(10f);
             var withdrawAmount = 1f;
@@ -124,6 +125,18 @@ class UserTest {
         void UserBuyListShouldBe(User user, Map<String, Integer> expectedBuyList){
             var userBuyList = user.getBuyList();
             Assertions.assertEquals(userBuyList, expectedBuyList);
+        }
+
+        @Test
+        public void GIVEN_AnonymousUser_WHEN_AddingNullItemToBuyList_THEN_ShouldThrowNullPointerException(){
+
+            var user = createUserWithEmptyBuyList();
+            Commodity nullItem = null;
+
+            Assertions.assertThrows(
+                    NullPointerException.class,
+                    () -> user.addBuyItem(nullItem)
+            );
         }
 
         @Test
@@ -220,6 +233,21 @@ class UserTest {
 
             UserBuyListShouldBe(user,Map.of("item", 1));
         }
+
+        
+        @Test
+        public void GIVEN_AnonymousUser_WHEN_RemovingNullItemToBuyList_THEN_ShouldThrowNullPointerException(){
+
+            var user = createUserWithEmptyBuyList();
+
+            Commodity nullItem = null;
+
+            Assertions.assertThrows(
+                    NullPointerException.class,
+                    () -> user.removeItemFromBuyList(nullItem)
+            );
+        }
+
     }
 
     @Nested
@@ -242,10 +270,9 @@ class UserTest {
             Assertions.assertEquals(userPurchasedList, expectedPurchasedList);
         }
 
-        //TODO: should add tests for negative quantity?
 
         @Test
-        public void GIVEN_UserWithEmptyPurchasedList_WHEN_AddingANewItem_THEN_ItemShouldBeAdded(){
+        public void GIVEN_AnonymousUser_WHEN_AddingANewPurchasedItem_THEN_ItemShouldBeAdded(){
 
             var user = createUserWitEmptyPurchasedList();
 
@@ -255,7 +282,7 @@ class UserTest {
         }
 
         @Test
-        public void GIVEN_UserWithNonEmptyPurchasedList_WHEN_AddingADuplicateItem_THEN_ItemQuantityShouldBeIncreased(){
+        public void GIVEN_UserWithNonEmptyPurchasedList_WHEN_AddingADuplicatePurchasedItem_THEN_ItemQuantityShouldBeIncreased(){
 
             var user = createUserWithGivenPurchasedList(Map.of("Purchased Item", 1));
 
@@ -264,6 +291,38 @@ class UserTest {
             UserPurchasedListShouldBe(user, Map.of("Purchased Item", 2));
         }
 
+        @Test
+        public void GIVEN_AnonymousUser_WHEN_AddingPurchasedItemWithNegativeQuantity_THEN_ShouldThrowException(){
+
+            var user = createUserWitEmptyPurchasedList();
+
+            Assertions.assertThrows(
+                    Exception.class,
+                    () -> user.addPurchasedItem("item", -1)
+            );
+
+        }
+
+        @Test
+        public void GIVEN_AnonymousUser_WHEN_AddingPurchasedItemWithZeroQuantity_THEN_ShouldNotAddItemToUser(){
+            var user = createUserWitEmptyPurchasedList();
+
+            user.addPurchasedItem("item", 0);
+
+            UserPurchasedListShouldBe(user, Map.of());
+        }
+
+        @ParameterizedTest
+        @NullAndEmptySource
+        public void GIVEN_AnonymousUser_WHEN_AddingPurchasedItemWithNullOrEmptyItemName_THEN_ShouldThrowNullPointerException
+                (String itemName){
+            var user = createUserWitEmptyPurchasedList();
+
+            Assertions.assertThrows(
+                    NullPointerException.class,
+                    () -> user.addPurchasedItem(itemName, 1)
+            );
+        }
     }
 
 }

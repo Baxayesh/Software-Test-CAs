@@ -81,7 +81,11 @@ public class Baloot {
 
     public void withdrawPayableAmount(User user) throws InsufficientCredit, NotInStock {
         float amount = getCurrentBuyListPrice(user);
-        user.withdrawCredit(amount);
+        try{
+            user.withdrawCredit(amount);
+        } catch (InvalidCreditRange ex) {
+            throw new RuntimeException("Function getCurrentBuyListPrice Returned a Negative Price");
+        }
 
         for (var entry : new ArrayList<>(user.getBuyList().entrySet())) {
             user.addPurchasedItem(entry.getKey(), entry.getValue());
