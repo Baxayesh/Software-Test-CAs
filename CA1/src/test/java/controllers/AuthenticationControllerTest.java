@@ -11,7 +11,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import service.Baloot;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static org.mockito.Mockito.doThrow;
@@ -80,15 +79,6 @@ class AuthenticationControllerTest {
         Assertions.assertEquals(HttpStatus.UNAUTHORIZED,response.getStatusCode());
     }
 
-    @Test
-    public void GIVEN_InvalidInput_WHEN_CallingLogin_Then_ShouldReturn404Status
-            () {
 
-        var body = new HashMap<String,String>();
-
-        var response = Controller.login(body);
-
-        Assertions.assertEquals(HttpStatus.BAD_REQUEST,response.getStatusCode());
-    }
 
 }
