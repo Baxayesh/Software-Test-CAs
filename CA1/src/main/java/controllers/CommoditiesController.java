@@ -21,6 +21,7 @@ public class CommoditiesController {
     public void setBaloot(Baloot baloot) {
         this.baloot = baloot;
     }
+
     @GetMapping(value = "/commodities")
     public ResponseEntity<ArrayList<Commodity>> getCommodities() {
         return new ResponseEntity<>(baloot.getCommodities(), HttpStatus.OK);
