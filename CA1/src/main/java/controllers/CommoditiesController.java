@@ -64,7 +64,13 @@ public class CommoditiesController {
         } catch (NotExistentUser ignored) {
         }
 
-        Comment comment = new Comment(commentId, user.getEmail(), user.getUsername(), Integer.parseInt(id), commentText);
+        Comment comment;
+        if(user == null){
+            comment = new Comment(commentId, null, null, Integer.parseInt(id), commentText);
+        }else{
+            comment = new Comment(commentId, user.getEmail(), user.getUsername(), Integer.parseInt(id), commentText);
+        }
+
         baloot.addComment(comment);
 
         return new ResponseEntity<>("comment added successfully!", HttpStatus.OK);
