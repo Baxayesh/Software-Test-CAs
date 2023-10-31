@@ -84,4 +84,90 @@ class CommoditiesControllerTest {
         assertEquals("rate added successfully!" ,  response.getBody());
 
     }
+    @Test
+    public void GIVEN_AnonymousCommodityNotExists_WHEN_AddingPositiveRateToCommodity_THEN_ShouldReturn404() throws  NotExistentCommodity {
+
+        when(BalootMock.getCommodityById("1")).thenThrow(NotExistentCommodity.class);
+
+        var response = Controller.rateCommodity("1" , Map.of("username" , "ali" , "rate" , "2"));
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
+
+    @Test
+    public void GIVEN_AnonymousCommodityExists_WHEN_AddingWrongRateToCommodity_THEN_ShouldReturn400() throws  NotExistentCommodity {
+        var response = Controller.rateCommodity("1" , Map.of("username" , "ali" , "rate" , "aa"));
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+    }
+
+    @Test
+    public void GIVEN_AnonymousCommentExists_WHEN_GettingCommentOfCommodity_THEN_ShouldReturnCommodityCommentsWith200Response()  {
+        ArrayList<Comment> comments = new ArrayList<>();
+        comments.add(new Comment());
+        when(BalootMock.getCommentsForCommodity(1)).thenReturn(comments);
+
+        var response = Controller.getCommodityComment("1");
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(comments, response.getBody());
+    }
+
+    @Test
+    public void GIVEN_AnonymousCommoditiesExists_WHEN_SearchCommoditiesWithOptionName_THEN_ShouldReturnCommodityWith200Response()  {
+        String searchOption = "name";
+        String searchValue = "something";
+
+        ArrayList<Commodity> commodities = new ArrayList<>();
+        commodities.add(new Commodity());
+
+        when(BalootMock.filterCommoditiesByName(searchValue)).thenReturn(commodities);
+
+        var response = Controller.searchCommodities(Map.of("searchOption" , searchOption ,"searchValue", searchValue ));
+        verify(BalootMock).filterCommoditiesByName(searchValue);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(commodities, response.getBody());
+    }
+
+    @Test
+    public void GIVEN_AnonymousCommoditiesExists_WHEN_SearchCommoditiesWithOptionCategory_THEN_ShouldReturnCommodityWith200Response()  {
+        String searchOption = "category";
+        String searchValue = "something";
+
+        ArrayList<Commodity> commodities = new ArrayList<>();
+        commodities.add(new Commodity());
+
+        when(BalootMock.filterCommoditiesByCategory(searchValue)).thenReturn(commodities);
+
+        var response = Controller.searchCommodities(Map.of("searchOption" , searchOption ,"searchValue", searchValue ));
+        verify(BalootMock).filterCommoditiesByCategory(searchValue);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(commodities, response.getBody());
+    }
+
+    @Test
+    public void GIVEN_AnonymousCommoditiesExists_WHEN_SearchCommoditiesWithOptionProvider_THEN_ShouldReturnCommodityWith200Response()  {
+        String searchOption = "provider";
+        String searchValue = "something";
+
+        ArrayList<Commodity> commodities = new ArrayList<>();
+        commodities.add(new Commodity());
+
+        when(BalootMock.filterCommoditiesByProviderName(searchValue)).thenReturn(commodities);
+
+        var response = Controller.searchCommodities(Map.of("searchOption" , searchOption ,"searchValue", searchValue ));
+        verify(BalootMock).filterCommoditiesByProviderName(searchValue);
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(commodities, response.getBody());
+    }
+    @Test
+    public void GIVEN_AnonymousCommoditiesExists_WHEN_SearchCommoditiesWithNoOption_THEN_ShouldReturnEmptyArrayWith200Response()  {
+        String searchOption = "wrong";
+        String searchValue = "something";
+
+        ArrayList<Commodity> commodities = new ArrayList<>();
+        var response = Controller.searchCommodities(Map.of("searchOption" , searchOption ,"searchValue", searchValue ));
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(commodities, response.getBody());
+    }
+
 }
