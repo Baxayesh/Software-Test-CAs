@@ -6,6 +6,7 @@ import exceptions.UsernameAlreadyTaken;
 import model.User;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,7 @@ import java.util.Map;
 
 import static org.mockito.Mockito.*;
 
-
+@DisplayName("Tests On Authentication Controller")
 class AuthenticationControllerTest {
 
     @Mock
@@ -26,6 +27,7 @@ class AuthenticationControllerTest {
 
     @Captor
     ArgumentCaptor<User> userArgumentCaptor;
+
     @BeforeEach
     public void init() {
         MockitoAnnotations.openMocks(this);
