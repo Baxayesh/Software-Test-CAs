@@ -90,20 +90,20 @@ public class EngineTest {
     @Test
     public void GIVEN_OrderHistoryNotEmpty_WHEN_AddingOrderFromDifferentCustomer_THEN_ShouldReturnOrderQuantityAndAddBothToHistory(){
 
-        try {
-            var firstCustomerOrder = CreateOrderByCustomerId(1,1);
-            Engine.orderHistory.add(firstCustomerOrder);
-            var secondCustomerOrder = CreateOrderByCustomerId(2, 2);
+        var firstCustomerOrder = CreateOrderByCustomerId(1,1);
+        var previousOrderFromSecondCustomer = CreateOrderByCustomerId(3,2);
+
+        Engine.orderHistory.add(firstCustomerOrder);
+        Engine.orderHistory.add(previousOrderFromSecondCustomer);
+
+        var secondCustomerOrder = CreateOrderByCustomerId(2, 2);
 
 
-            var result = Engine.addOrderAndGetFraudulentQuantity(secondCustomerOrder);
+        var result = Engine.addOrderAndGetFraudulentQuantity(secondCustomerOrder);
 
-            Assert.assertEquals(1, result);
-            Assert.assertEquals(2, Engine.orderHistory.size());
-        } catch (Exception ex){
-            //because code is wrong
+        Assert.assertEquals(0, result);
+        Assert.assertEquals(3, Engine.orderHistory.size());
 
-        }
 
 
     }
@@ -135,7 +135,7 @@ public class EngineTest {
     }
 
     @Test
-    public void GIVEN____(){
+    public void TEST_justForCoveringGetQuantityPatternByPrice_first(){
 
         var historicalOrder1 = CreateOrder(1,10,1,200);
         var historicalOrder2 = CreateOrder(2,20, 1, 200);
@@ -153,28 +153,28 @@ public class EngineTest {
         Assert.assertEquals(4, Engine.orderHistory.size());
 
     }
+
     @Test
-    public void GIVEN____2(){
+    public void TEST_justForCoveringGetQuantityPatternByPrice_second(){
 
         var historicalOrder1 = CreateOrder(1,10,1,200);
+        var historicalOrder4 = CreateOrder(10,30, 1, 300);
         var historicalOrder2 = CreateOrder(2,20, 1, 200);
         var historicalOrder3 = CreateOrder(3,30, 1, 200);
 
         Engine.orderHistory.add(historicalOrder1);
         Engine.orderHistory.add(historicalOrder2);
         Engine.orderHistory.add(historicalOrder3);
+        Engine.orderHistory.add(historicalOrder4);
 
         var newOrder = CreateOrder(5, 1, 1, 200);
 
         var result = Engine.addOrderAndGetFraudulentQuantity(newOrder);
 
         Assert.assertEquals(10, result);
-        Assert.assertEquals(4, Engine.orderHistory.size());
+        Assert.assertEquals(5, Engine.orderHistory.size());
 
     }
-
-
-
 
 
 }
