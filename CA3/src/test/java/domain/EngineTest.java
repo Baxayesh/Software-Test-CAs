@@ -32,6 +32,16 @@ public class EngineTest {
         order.setCustomer(customer);
         return order;
     }
+
+    Order CreateOrder(int orderId, int quantity, int customer, int price){
+        var order = new Order();
+        order.setId(orderId);
+        order.setQuantity(quantity);
+        order.setCustomer(customer);
+        order.setPrice(price);
+        return order;
+    }
+
     @Before
     public void Init_Engine(){
         Engine = new Engine();
@@ -111,6 +121,60 @@ public class EngineTest {
         Assert.assertEquals(2, Engine.orderHistory.size());
 
     }
+
+    @Test
+    public void GIVEN_HistoryIsEmpty_WHEN_OrderWithZeroQuantity_Then_ShouldReturnZeroAndAddToHistory(){
+
+        var order = CreateOrderByIdAndQuantityForAnonymousCustomer(1,0);;
+
+        var result = Engine.addOrderAndGetFraudulentQuantity(order);
+
+        Assert.assertEquals(0, result);
+        Assert.assertEquals(1, Engine.orderHistory.size());
+
+    }
+
+    @Test
+    public void GIVEN____(){
+
+        var historicalOrder1 = CreateOrder(1,10,1,200);
+        var historicalOrder2 = CreateOrder(2,20, 1, 200);
+        var historicalOrder3 = CreateOrder(3,35, 1, 200);
+
+        Engine.orderHistory.add(historicalOrder1);
+        Engine.orderHistory.add(historicalOrder2);
+        Engine.orderHistory.add(historicalOrder3);
+
+        var newOrder = CreateOrder(5, 1, 1, 200);
+
+        var result = Engine.addOrderAndGetFraudulentQuantity(newOrder);
+
+        Assert.assertEquals(0, result);
+        Assert.assertEquals(4, Engine.orderHistory.size());
+
+    }
+    @Test
+    public void GIVEN____2(){
+
+        var historicalOrder1 = CreateOrder(1,10,1,200);
+        var historicalOrder2 = CreateOrder(2,20, 1, 200);
+        var historicalOrder3 = CreateOrder(3,30, 1, 200);
+
+        Engine.orderHistory.add(historicalOrder1);
+        Engine.orderHistory.add(historicalOrder2);
+        Engine.orderHistory.add(historicalOrder3);
+
+        var newOrder = CreateOrder(5, 1, 1, 200);
+
+        var result = Engine.addOrderAndGetFraudulentQuantity(newOrder);
+
+        Assert.assertEquals(10, result);
+        Assert.assertEquals(4, Engine.orderHistory.size());
+
+    }
+
+
+
 
 
 }
