@@ -17,6 +17,7 @@ public class UserController {
     public void setBaloot(Baloot baloot) {
         this.baloot = baloot;
     }
+
     @GetMapping(value = "/users/{id}")
     public ResponseEntity<User> getUser(@PathVariable String id) {
         try {
