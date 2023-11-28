@@ -1,6 +1,7 @@
 package ApiTest;
 
 import static ApiTest.ResponseObjectListMatcher.responseListBody;
+import static ApiTest.ResponseObjectMatcher.responseBody;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
