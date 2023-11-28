@@ -1,14 +1,21 @@
 package ApiTest;
 
+import static ApiTest.ResponseObjectListMatcher.responseListBody;
+import static ApiTest.ResponseObjectMatcher.responseBody;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import application.BalootApplication;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import controllers.CommoditiesController;
 import controllers.UserController;
 import exceptions.NotExistentCommodity;
@@ -27,8 +34,10 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import service.Baloot;
@@ -48,8 +57,12 @@ public class CommoditiesControllerTest {
     @Autowired
     private CommoditiesController controller;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockBean
     private Baloot baloot;
+
 
     @BeforeEach
     public void setUp() {
@@ -58,13 +71,58 @@ public class CommoditiesControllerTest {
     }
 
 
+    User CreateAnonymousUserById(String id){
+        var user = new User();
+        user.setUsername(id);
+        return user;
+    }
+
 
     @Nested
     @DisplayName("Tests For /commodities/{id}/comment")
     public class CommentTests{
 
+        String URI = "/commodities/{id}/comment";
+
+        @Test
+        public void CALLING_addCommodityComment_WHEN_validComment_THEN_success() throws Exception {
+
+            var commodityId = "1";
+            var userId = "user";
+            var user = CreateAnonymousUserById(userId);
+            when(baloot.getUserById(userId)).thenReturn(user);
+
+            var body = Map.of("username",userId, "comment","comment text");
+
+            mockMvc
+                    .perform(
+                            post(URI, commodityId)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(body))
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("comment added successfully!"));
 
 
+        }
+
+        @Test
+        public void CALLING_getCommodityComment_WHEN_validComment_THEN_success() throws Exception {
+
+            var commodityId =1;
+            var commentList = new ArrayList<Comment>();
+            commentList.add(new Comment());
+            commentList.add(new Comment());
+            commentList.add(new Comment());
+            when(baloot.getCommentsForCommodity(commodityId)).thenReturn(commentList);
+
+            mockMvc
+                    .perform(
+                            get(URI, commodityId)
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(responseListBody().containsObjectAsJson(commentList));
+        }
     }
 
     @Nested
