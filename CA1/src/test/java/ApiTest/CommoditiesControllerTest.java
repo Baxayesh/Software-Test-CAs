@@ -1,7 +1,6 @@
 package ApiTest;
 
 import static ApiTest.ResponseObjectListMatcher.responseListBody;
-import static ApiTest.ResponseObjectMatcher.responseBody;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -14,12 +13,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import application.BalootApplication;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import controllers.CommoditiesController;
-import controllers.UserController;
 import exceptions.NotExistentCommodity;
-import exceptions.NotExistentUser;
 import model.Comment;
 import model.Commodity;
 import model.User;
@@ -28,16 +24,11 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import service.Baloot;
@@ -292,7 +283,39 @@ public class CommoditiesControllerTest {
     @DisplayName("Tests For /commodities/{id}/suggested")
     public  class SuggestionTests {
 
+        String URI = "/commodities/{id}/suggested";
 
+        @Test
+        public void CALLING_getSuggestedCommodities_WHEN_validId_THEN_success() throws Exception{
+
+            var commodityId = 1;
+            var suggestions = CreateListOfAnonymousCommodities();
+            when(baloot.suggestSimilarCommodities(any())).thenReturn(suggestions);
+
+            mockMvc
+                    .perform(
+                            get(URI, commodityId)
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(responseListBody().containsObjectAsJson(suggestions));
+
+        }
+
+
+        @Test
+        public void CALLING_getSuggestedCommodities_WHEN_NonExistentCommodityId_THEN_shouldReturnEmptyListWith404() throws Exception{
+
+            var commodityId = "commodityId";
+            when(baloot.getCommodityById(commodityId)).thenThrow(new NotExistentCommodity());
+
+            mockMvc
+                    .perform(
+                            get(URI, commodityId)
+                    )
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().string("[]"));
+
+        }
     }
 
     @Nested
