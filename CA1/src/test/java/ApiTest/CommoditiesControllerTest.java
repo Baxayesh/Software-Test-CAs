@@ -299,7 +299,48 @@ public class CommoditiesControllerTest {
     @DisplayName("Tests For /commodities/{id} and /commodities")
     public  class FetchTests {
 
+        String URI = "/commodities";
+        String URI_WITH_ID = "/commodities/{id}";
+        @Test
+        public void CALLING_getCommodities_WHEN_nothing_THEN_success() throws Exception {
+            var commodityList = CreateListOfAnonymousCommodities();
+            when(baloot.getCommodities()).thenReturn(commodityList);
 
+            mockMvc
+                    .perform(
+                            get(URI)
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(responseListBody().containsObjectAsJson(commodityList));
+        }
+
+        @Test
+        public void CALLING_getCommodity_WHEN_validId_THEN_success() throws Exception {
+            var commodityId = "1";
+            var tempCommodity = new Commodity();
+            when(baloot.getCommodityById(commodityId)).thenReturn(tempCommodity);
+
+            mockMvc
+                    .perform(
+                            get(URI_WITH_ID,commodityId )
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(responseBody().containsObjectAsJson(tempCommodity , Commodity.class));
+        }
+
+        @Test
+        public void CALLING_getCommodity_WHEN_invalidId_THEN_error() throws Exception {
+            var commodityId = "1";
+
+            when(baloot.getCommodityById(commodityId)).thenThrow(new NotExistentCommodity());
+
+            mockMvc
+                    .perform(
+                            get(URI_WITH_ID,commodityId )
+                    )
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().string(""));
+        }
     }
 
 }
