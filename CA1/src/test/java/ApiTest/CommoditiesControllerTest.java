@@ -77,6 +77,13 @@ public class CommoditiesControllerTest {
         return user;
     }
 
+    ArrayList<Commodity> CreateListOfAnonymousCommodities(){
+        var list = new ArrayList<Commodity>();
+        list.add(new Commodity());
+        list.add(new Commodity());
+        list.add(new Commodity());
+        return list;
+    }
 
     @Nested
     @DisplayName("Tests For /commodities/{id}/comment")
@@ -129,13 +136,87 @@ public class CommoditiesControllerTest {
     @DisplayName("Tests For /commodities/{id}/rate")
     public  class RatingTests {
 
-
     }
 
     @Nested
     @DisplayName("Tests For /commodities/search")
     public  class SearchTests {
 
+        String URI = "/commodities/search";
+
+        @Test
+        public void CALLING_searchCommodities_WHEN_searchOptionIsName_THEN_shouldReturnSearchAnswer() throws Exception{
+
+            var searchValue = "some search Value";
+            var searchResult = CreateListOfAnonymousCommodities();
+            var searchOption = "name";
+            when(baloot.filterCommoditiesByName(searchValue)).thenReturn(searchResult);
+            var body = Map.of("searchOption",searchOption, "searchValue", searchValue);
+
+            mockMvc
+                    .perform(
+                            post(URI)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(body))
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(responseListBody().containsObjectAsJson(searchResult));
+        }
+
+        @Test
+        public void CALLING_searchCommodities_WHEN_searchOptionIsCategory_THEN_shouldReturnSearchAnswer() throws Exception{
+
+            var searchValue = "some search Value";
+            var searchResult = CreateListOfAnonymousCommodities();
+            var searchOption = "category";
+            when(baloot.filterCommoditiesByCategory(searchValue)).thenReturn(searchResult);
+            var body = Map.of("searchOption",searchOption, "searchValue", searchValue);
+
+            mockMvc
+                    .perform(
+                            post(URI)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(body))
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(responseListBody().containsObjectAsJson(searchResult));
+        }
+
+        @Test
+        public void CALLING_searchCommodities_WHEN_searchOptionIsProvider_THEN_shouldReturnSearchAnswer() throws Exception{
+
+            var searchValue = "some search Value";
+            var searchResult = CreateListOfAnonymousCommodities();
+            var searchOption = "provider";
+            when(baloot.filterCommoditiesByProviderName(searchValue)).thenReturn(searchResult);
+            var body = Map.of("searchOption",searchOption, "searchValue", searchValue);
+
+            mockMvc
+                    .perform(
+                            post(URI)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(body))
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(responseListBody().containsObjectAsJson(searchResult));
+        }
+
+        @Test
+        public void CALLING_searchCommodities_WHEN_searchOptionIsInvalid_THEN_shouldReturnEmptyList() throws Exception{
+
+            var searchValue = "some search Value";
+            var searchOption = "invalid option";
+            var body = Map.of("searchOption",searchOption, "searchValue", searchValue);
+
+            mockMvc
+                    .perform(
+                            post(URI)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(body))
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(responseListBody().containsObjectAsJson(new ArrayList<>()));
+        }
 
     }
 
