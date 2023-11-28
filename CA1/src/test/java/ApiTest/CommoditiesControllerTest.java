@@ -135,7 +135,75 @@ public class CommoditiesControllerTest {
     @Nested
     @DisplayName("Tests For /commodities/{id}/rate")
     public  class RatingTests {
+        String URI = "/commodities/{id}/rate";
 
+        @Test
+        public void CALLING_addCommodityRate_WHEN_validCommodityAndRate_THEN_success() throws Exception {
+
+            int rate  = 1;
+            String username = "username";
+            String commodityId = "1";
+            Commodity tempCommodity = new Commodity();
+            when(baloot.getCommodityById(commodityId)).thenReturn(tempCommodity);
+
+            var body = Map.of("rate",rate, "username",username);
+
+            mockMvc
+                    .perform(
+                            post(URI, commodityId)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(body))
+                    )
+                    .andExpect(status().isOk())
+                    .andExpect(content().string("rate added successfully!"));
+
+
+        }
+
+        @Test
+        public void CALLING_addCommodityRate_WHEN_validCommodityAndInvalidRate_THEN_error() throws Exception {
+
+            var rate  = "a";
+            String username = "username";
+            String commodityId = "1";
+            Commodity tempCommodity = new Commodity();
+            when(baloot.getCommodityById(commodityId)).thenReturn(tempCommodity);
+
+            var body = Map.of("rate",rate, "username",username);
+
+            mockMvc
+                    .perform(
+                            post(URI, commodityId)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(body))
+                    )
+                    .andExpect(status().isBadRequest())
+                    .andExpect(content().string("For input string: \""+rate+"\""));
+                    // invalid message
+
+        }
+        @Test
+        public void CALLING_addCommodityRate_WHEN_invalidCommodityAndvalidRate_THEN_error() throws Exception {
+
+            var rate  = 1;
+            String username = "username";
+            String commodityId = "1";
+            Commodity tempCommodity = new Commodity();
+            when(baloot.getCommodityById(commodityId)).thenThrow(new NotExistentCommodity());
+
+            var body = Map.of("rate",rate, "username",username);
+
+            mockMvc
+                    .perform(
+                            post(URI, commodityId)
+                                    .contentType(MediaType.APPLICATION_JSON)
+                                    .content(objectMapper.writeValueAsString(body))
+                    )
+                    .andExpect(status().isNotFound())
+                    .andExpect(content().string("Commodity does not exist."));
+            // invalid message
+
+        }
     }
 
     @Nested
