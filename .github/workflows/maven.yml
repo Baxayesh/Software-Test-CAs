@@ -29,12 +29,8 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-
-    - name: change cwd to CA1
-      run: cd CA1
-      
-    - name : create mutation coverage report
-      run: mvn test-compile org.pitest:pitest-maven:mutationCoverage
+    - name : run tests for CA1
+      run: mvn test --file CA1/pom.xml
       
     # - name: Build with Maven
     #   run: mvn -B package --file pom.xml
